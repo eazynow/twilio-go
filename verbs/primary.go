@@ -20,16 +20,47 @@ Dial
 */
 
 type Say struct {
-	Voice    string `xml:"voice,attr,omitempty"`
-	Language string `xml:"language,attr,omitempty"`
-	Loop     int    `xml:"loop,attr,omitempty"`
-	Text     string `xml:",chardata"`
+	XMLName  xml.Name `xml:"Say"`
+	Voice    string   `xml:"voice,attr,omitempty"`
+	Language string   `xml:"language,attr,omitempty"`
+	Loop     int      `xml:"loop,attr,omitempty"`
+
+	Text string `xml:",chardata"`
 }
 
 type Play struct {
+	Loop int    `xml:"loop,attr,omitempty"`
+	Url  string `xml:",chardata"`
 }
 
 type Gather struct {
+	Say   interface{}
+	Play  interface{}
+	Pause interface{}
+}
+
+func (g *Gather) AddSay(s Say) {
+	g.Say = s
+}
+
+func (g *Gather) RemoveSay() {
+	g.Say = nil
+}
+
+func (g *Gather) AddPlay(p Play) {
+	g.Play = p
+}
+
+func (g *Gather) RemovePlay() {
+	g.Play = nil
+}
+
+func (g *Gather) AddPause(length int) {
+	g.Pause = Pause{Length: length}
+}
+
+func (g *Gather) RemovePause() {
+	g.Play = nil
 }
 
 type Record struct {

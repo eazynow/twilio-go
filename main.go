@@ -17,7 +17,7 @@ func main() {
 func primary() {
 	fmt.Println("\nPrimary verbs")
 
-	say := Say{
+	say := verbs.Say{
 		Voice:    "man",
 		Language: "en-gb",
 		Loop:     1,
@@ -29,6 +29,52 @@ func primary() {
 	}
 
 	os.Stdout.Write(xmlout)
+	fmt.Println("")
+
+	/* Add Play */
+	play := verbs.Play{}
+
+	gather := verbs.Gather{}
+
+	xmlout, err = xml.MarshalIndent(gather, "  ", "    ")
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+	}
+
+	os.Stdout.Write(xmlout)
+	fmt.Println("")
+
+	gather.AddSay(say)
+
+	xmlout, err = xml.MarshalIndent(gather, "  ", "    ")
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+	}
+
+	os.Stdout.Write(xmlout)
+	fmt.Println("")
+
+	gather.AddPause(10)
+
+	xmlout, err = xml.MarshalIndent(gather, "  ", "    ")
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+	}
+
+	os.Stdout.Write(xmlout)
+	fmt.Println("")
+
+	gather.RemoveSay()
+
+	gather.AddPlay(play)
+
+	xmlout, err = xml.MarshalIndent(gather, "  ", "    ")
+	if err != nil {
+		fmt.Printf("error: %v\n", err)
+	}
+
+	os.Stdout.Write(xmlout)
+	fmt.Println("")
 
 	sip := verbs.Sip{}
 	sip.Username = "user1"
