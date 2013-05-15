@@ -1,9 +1,4 @@
-// key twilio verb structs
-package verbs
-
-/*
-
-*/
+package attribs
 
 type UrlCallAttributes struct {
 	Url    string `xml:"url,attr,omitempty"`

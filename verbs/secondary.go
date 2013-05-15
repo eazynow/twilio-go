@@ -12,6 +12,7 @@ Pause
 
 import (
 	"encoding/xml"
+	"twilio-go/attribs"
 )
 
 type Enqueue struct {
@@ -20,7 +21,7 @@ type Enqueue struct {
 	// A request is made to the action URL when the call
 	// leaves the queue, describing the dequeue reason
 	// and details about the time spent in the queue
-	ActionAttributes
+	attribs.ActionAttributes
 
 	// The 'waitUrl' attribute specifies a URL pointing to a
 	// TwiML document containing TwiML verbs that will be

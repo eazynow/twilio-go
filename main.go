@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
+	"twilio-go/nouns"
 	"twilio-go/verbs"
 )
 
@@ -76,7 +77,7 @@ func primary() {
 	os.Stdout.Write(xmlout)
 	fmt.Println("")
 
-	sip := verbs.Sip{}
+	sip := nouns.Sip{}
 	sip.Username = "user1"
 	sip.Uri = "Test"
 	sip.Password = "pass1"
