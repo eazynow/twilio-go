@@ -96,12 +96,11 @@ func secondary() {
 	fmt.Println("\nSecondary verbs")
 
 	v := verbs.Enqueue{
-		Action:        "http://www.something.com",
-		Method:        "POST",
 		WaitUrl:       "http://www.wait.com",
 		WaitUrlMethod: "POST",
 		QueueName:     "newqueue"}
-	v.Action = "POST"
+	v.Action = "http://www.something.com"
+	v.Method = "POST"
 
 	xmlout, err := xml.MarshalIndent(v, "  ", "    ")
 	if err != nil {

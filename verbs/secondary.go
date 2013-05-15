@@ -20,8 +20,7 @@ type Enqueue struct {
 	// A request is made to the action URL when the call
 	// leaves the queue, describing the dequeue reason
 	// and details about the time spent in the queue
-	Action string `xml:"action,attr,omitempty"`
-	Method string `xml:"method,attr,omitempty"`
+	ActionAttributes
 
 	// The 'waitUrl' attribute specifies a URL pointing to a
 	// TwiML document containing TwiML verbs that will be

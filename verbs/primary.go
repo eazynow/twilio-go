@@ -34,6 +34,8 @@ type Play struct {
 }
 
 type Gather struct {
+	// by declaring these as interfaces, they don't get
+	// included if empty
 	Say   interface{}
 	Play  interface{}
 	Pause interface{}
