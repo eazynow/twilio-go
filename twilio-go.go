@@ -1,5 +1,9 @@
 package twiliogo
 
+import (
+	"io/ioutil"
+)
+
 // add a constant for version
 
 type TwilioRestClient struct {
@@ -11,7 +15,15 @@ type TwilioRestClient struct {
 }
 
 func (twilio *Twilio) post(formValues url.Values, twilioUrl string) (*http.Response, error) {
-	req, err := http.NewRequest("POST", twilioUrl, strings.NewReader(formValues.Encode()))
+	return twilio.callTwilio("POST", formValues, twilioUrl)
+}
+
+func (twilio *Twilio) get(formValues url.Values, twilioUrl string) (*http.Response, error) {
+	return twilio.callTwilio("GET", formValues, twilioUrl)
+}
+
+func (twilio *Twilio) callTwilio(method string, formValues url.Values, twilioUrl string) (*http.Response, error) {
+	req, err := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
 	if err != nil {
 		return nil, err
 	}
