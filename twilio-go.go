@@ -14,18 +14,18 @@ type TwilioRestClient struct {
 	NumRetries          int
 }
 
-func (twilio *Twilio) post(formValues url.Values, twilioUrl string) (*http.Response, error) {
+func (twilio *Twilio) post(formValues url.Values, twilioUrl string) (body []byte, status int, error) {
 	return twilio.callTwilio("POST", formValues, twilioUrl)
 }
 
-func (twilio *Twilio) get(formValues url.Values, twilioUrl string) (*http.Response, error) {
+func (twilio *Twilio) get(formValues url.Values, twilioUrl string) (body []byte, status int, error) {
 	return twilio.callTwilio("GET", formValues, twilioUrl)
 }
 
-func (twilio *Twilio) callTwilio(method string, formValues url.Values, twilioUrl string) (*http.Response, error) {
-	req, err := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
-	if err != nil {
-		return nil, err
+func (twilio *Twilio) callTwilio(method string, formValues url.Values, twilioUrl string) ([]byte, int, error) {
+	req, httperr := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
+	if httperr != nil {
+		return nil, httperr
 	}
 
 	// use basic auth to connect
@@ -33,7 +33,12 @@ func (twilio *Twilio) callTwilio(method string, formValues url.Values, twilioUrl
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	c := &http.Client{}
-	return c.Do(req)
+
+	res, err := c.Do(req)
+
+	body, callerr := ioutil.ReadAll(res.Body)
+
+	return body, res.status, callerr
 }
 
 func NewTwilioRestClient(accountSid, authToken, endPoint string) {
