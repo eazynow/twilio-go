@@ -14,15 +14,15 @@ type TwilioRestClient struct {
 	NumRetries          int
 }
 
-func (twilio *Twilio) post(formValues url.Values, twilioUrl string) (body []byte, status int, error) {
+func (twilio *TwilioRestClient) post(formValues url.Values, twilioUrl string) (body []byte, status int, error) {
 	return twilio.callTwilio("POST", formValues, twilioUrl)
 }
 
-func (twilio *Twilio) get(formValues url.Values, twilioUrl string) (body []byte, status int, error) {
+func (twilio *TwilioRestClient) get(formValues url.Values, twilioUrl string) (body []byte, status int, error) {
 	return twilio.callTwilio("GET", formValues, twilioUrl)
 }
 
-func (twilio *Twilio) callTwilio(method string, formValues url.Values, twilioUrl string) ([]byte, int, error) {
+func (twilio *TwilioRestClient) callTwilio(method string, formValues url.Values, twilioUrl string) ([]byte, int, error) {
 	req, httperr := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
 	if httperr != nil {
 		return nil, httperr
