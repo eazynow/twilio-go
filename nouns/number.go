@@ -2,7 +2,7 @@ package nouns
 
 import (
 	"encoding/xml"
-	"github.com/eazynow/twilio-go/attribs"
+	"twilio-go/attribs"
 )
 
 type Number struct {

@@ -3,8 +3,8 @@ package verbs
 
 import (
 	"encoding/xml"
-	"github.com/eazynow/twilio-go/attribs"
-	"github.com/eazynow/twilio-go/nouns"
+	"twilio-go/attribs"
+	"twilio-go/nouns"
 )
 
 /*
