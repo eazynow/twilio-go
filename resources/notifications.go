@@ -15,7 +15,7 @@ type NotificationParams struct {
 
 type NotificationListResponse struct {
 	ListResponse
-	list []NotificationSummary
+	List []NotificationSummary
 }
 
 type Notifications struct {
@@ -29,6 +29,6 @@ func (nots *Notifications) GetBySid(sid string) Notification {
 	return n
 }
 
-func (nots *Notifications) GetList(params NotificationParams) NotificationListResponse {
-	return NotificationListResponse{}
+func (nots *Notifications) GetList(params NotificationParams) (NotificationListResponse, error) {
+	return NotificationListResponse{}, nil
 }
