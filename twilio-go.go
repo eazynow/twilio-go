@@ -1,56 +1,57 @@
 package twiliogo
 
 import (
-	"io/ioutil"
-	"net/http"
+	"fmt"
+	"github.com/eazynow/twilio-go/resources"
+	"log"
 	"net/url"
-	"strings"
 )
 
 // add a constant for version
 
 type TwilioRestClient struct {
-	AccountSid     string
-	AuthToken      string
-	Endpoint       string
-	DefaultVersion string
-	NumRetries     int
+	Connection    *resources.TwilioConnection
+	NumRetries    int
+	Notifications resources.Notifications
 }
 
-func (twilio *TwilioRestClient) callTwilio(method string, formValues url.Values, twilioUrl string) (string, int, error) {
-	// req, httperr := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
-	req, _ := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
+func NewTwilioRestClient(sid, token string) *TwilioRestClient {
+	apibase := "https://api.twilio.com"
+	apiversion := "2010-04-01"
 
-	// use basic auth to connect
-	req.SetBasicAuth(twilio.AccountSid, twilio.AuthToken)
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	c := &http.Client{}
-
-	//res, err := c.Do(req)
-	res, _ := c.Do(req)
-
-	// body, callerr := ioutil.ReadAll(res.Body)
-	response, callerr := ioutil.ReadAll(res.Body)
-
-	return string(response), res.StatusCode, callerr
-}
-
-func (twilio *TwilioRestClient) Post(formValues url.Values, twilioUrl string) (string, int, error) {
-	return twilio.callTwilio("POST", formValues, twilioUrl)
-}
-
-func (twilio *TwilioRestClient) Get(formValues url.Values, twilioUrl string) (string, int, error) {
-	return twilio.callTwilio("GET", formValues, twilioUrl)
-}
-
-func NewTwilioRestClient(accountSid, authToken, endPoint string) *TwilioRestClient {
-	twilioUrl := "https://api.twilio.com/2010-04-01"
 	retries := 1
+
+	twilioUrl, err := url.Parse(fmt.Sprintf("%s/%s", apibase, apiversion))
+
+	if err != nil {
+		log.Fatalf("twilio-go: Bad twilio api version (%s) or endpoint (%s) : %s", apibase, apiversion, err)
+	}
+
+	tcred := resources.TwilioAuth{
+		AccountSid: sid,
+		AuthToken:  token,
+	}
+
+	tcon := resources.TwilioConnection{
+		Credentials: tcred,
+		Endpoint:    twilioUrl.String(),
+		NumRetries:  retries,
+	}
+
+	tnot := resources.Notifications{
+		Connection: &tcon,
+	}
+
 	return &TwilioRestClient{
-		AccountSid:     accountSid,
-		AuthToken:      authToken,
-		Endpoint:       endPoint,
-		DefaultVersion: twilioUrl,
-		NumRetries:     retries}
+		Connection:    &tcon,
+		Notifications: tnot,
+		NumRetries:    retries}
+}
+
+func (trc *TwilioRestClient) SetRetries(retries int) {
+	trc.NumRetries = retries
+	trc.Connection.NumRetries = retries
+	fmt.Println("trcConnRetries :", retries)
+
+	fmt.Println("NotificationRetries :", trc.Notifications.Connection.NumRetries)
 }
