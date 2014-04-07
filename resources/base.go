@@ -8,3 +8,21 @@ type Resource struct {
 type InstanceResource struct {
 	Resource
 }
+
+type PagingParams struct {
+	PageSize int
+	Page     int
+}
+
+type ListResponse struct {
+	PagingParams
+	NumPages        int
+	Total           int
+	Start           int
+	End             int
+	Uri             string
+	FirstPageUri    string
+	NextPageUri     string
+	PreviousPageUri string
+	LastPageUri     string
+}
