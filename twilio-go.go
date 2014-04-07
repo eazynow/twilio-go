@@ -51,7 +51,5 @@ func NewTwilioRestClient(sid, token string) *TwilioRestClient {
 func (trc *TwilioRestClient) SetRetries(retries int) {
 	trc.NumRetries = retries
 	trc.Connection.NumRetries = retries
-	fmt.Println("trcConnRetries :", retries)
-
-	fmt.Println("NotificationRetries :", trc.Notifications.Connection.NumRetries)
+	// Connection is a pointer reference so all other structs should get the change
 }
