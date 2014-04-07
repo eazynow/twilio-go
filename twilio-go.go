@@ -31,9 +31,9 @@ func (twilio *TwilioRestClient) callTwilio(method string, formValues url.Values,
 	res, _ := c.Do(req)
 
 	// body, callerr := ioutil.ReadAll(res.Body)
-	_, callerr := ioutil.ReadAll(res.Body)
+	response, callerr := ioutil.ReadAll(res.Body)
 
-	return "body", res.StatusCode, callerr
+	return string(response), res.StatusCode, callerr
 }
 
 func (twilio *TwilioRestClient) Post(formValues url.Values, twilioUrl string) (string, int, error) {
