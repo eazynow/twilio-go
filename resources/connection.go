@@ -21,10 +21,8 @@ type TwilioConnection struct {
 
 // callTwilio is a private function that makes a http call to twilio
 func (tc *TwilioConnection) callTwilio(method string, formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
-	// req, httperr := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
 	fullUrl := fmt.Sprintf("%s/Accounts/%s/%s.json", tc.Endpoint, url.QueryEscape(sid), twilioUrl)
 
-	fmt.Println(fullUrl)
 	req, err := http.NewRequest(method, fullUrl, strings.NewReader(formValues.Encode()))
 
 	if err != nil {

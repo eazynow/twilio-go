@@ -3,6 +3,7 @@ package resources
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/url"
 )
@@ -56,10 +57,26 @@ type Notifications struct {
 	Connection *TwilioConnection
 }
 
-func (nots *Notifications) GetBySid(sid string) Notification {
-	n := Notification{}
+func (nots *Notifications) GetBySid(notificationSid, accountSid string) (*Notification, error) {
 
-	return n
+	// use master account if no sub account selected
+	if len(accountSid) == 0 {
+		accountSid = nots.Connection.Credentials.AccountSid
+	}
+
+	notUrl := fmt.Sprintf("Notifications/%s", url.QueryEscape(notificationSid))
+
+	resp, err := nots.Connection.Get(url.Values{}, accountSid, notUrl)
+
+	defer resp.Body.Close()
+
+	decoder := json.NewDecoder(resp.Body)
+
+	notResponse := new(Notification)
+
+	err = decoder.Decode(notResponse)
+
+	return notResponse, err
 }
 
 func (nots *Notifications) GetList(params NotificationParams) (*NotificationListResponse, error) {
@@ -81,11 +98,11 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 
 	decoder := json.NewDecoder(resp.Body)
 
-	listReponse := new(NotificationListResponse)
+	listResponse := new(NotificationListResponse)
 
-	err = decoder.Decode(listReponse)
+	err = decoder.Decode(listResponse)
 
-	return listReponse, err
+	return listResponse, err
 }
 
 func (nots *Notifications) DeleteBySid(sid string) {
