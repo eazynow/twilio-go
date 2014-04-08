@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 )
 
 type NotificationResponse struct {
-	ErrorResponse
 }
 
 // NotificationBasic represents the core fields relating to a twilio notification.
@@ -75,7 +75,7 @@ func (nots *Notifications) GetBySid(notificationSid, accountSid string) (*Notifi
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		log.Fatalf("Expected a 200 from twilio but got a %d", resp.StatusCode)
+		return nil, nots.returnError(resp)
 	}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -101,7 +101,7 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 	}
 
 	if resp.StatusCode != 200 {
-		log.Fatalf("Expected a 200 from twilio but got a %d", resp.StatusCode)
+		return nil, nots.returnError(resp)
 	}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -113,7 +113,7 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 	return listResponse, err
 }
 
-func (nots *Notifications) DeleteBySid(notificationSid string, accountSid string) {
+func (nots *Notifications) DeleteBySid(notificationSid string, accountSid string) error {
 	// use master account if no sub account selected
 	if len(accountSid) == 0 {
 		accountSid = nots.Connection.Credentials.AccountSid
@@ -126,14 +126,20 @@ func (nots *Notifications) DeleteBySid(notificationSid string, accountSid string
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 204 {
-		log.Fatalf("Expected a 204 from twilio but got a %d", resp.StatusCode)
+		return nots.returnError(resp)
 	}
 
-	//decoder := json.NewDecoder(resp.Body)
+	return nil
+}
 
-	//notResponse := new(Notification)
+func (nots *Notifications) returnError(resp *http.Response) error {
+	decoder := json.NewDecoder(resp.Body)
 
-	//err = decoder.Decode(notResponse)
+	twilioErr := new(TwilioError)
 
-	//return notResponse, err
+	err := decoder.Decode(twilioErr)
+	if err == nil {
+		err = twilioErr
+	}
+	return err
 }

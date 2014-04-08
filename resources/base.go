@@ -1,5 +1,7 @@
 package resources
 
+import "fmt"
+
 // A REST resource
 type Resource struct {
 }
@@ -27,9 +29,13 @@ type ListResponse struct {
 	LastPageUri     string `json:"last_page_uri"`
 }
 
-type ErrorResponse struct {
+type TwilioError struct {
 	Code     int    `json:"code"`
 	Message  string `json:"message"`
 	MoreInfo string `json:"more_info"`
 	Status   int    `json:"status"`
+}
+
+func (te *TwilioError) Error() string {
+	return fmt.Sprintf("Twilio Error: (%d) %s", te.Code, te.Message)
 }
