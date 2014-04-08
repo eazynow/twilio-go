@@ -8,15 +8,19 @@ import (
 	"net/url"
 )
 
+type NotificationResponse struct {
+	ErrorResponse
+}
+
 // NotificationBasic represents the core fields relating to a twilio notification.
 // This is a subset of the full Notification object to reduce size in list responses.
 type NotificationBasic struct {
+	NotificationResponse
 	Sid           string `json:"sid"`
 	AccountSid    string `json:"account_sid"`
 	CallSid       string `json:"call_sid"`
 	Log           string `json:"log"`
 	ErrorCode     string `json:"error_code"`
-	MoreInfo      string `json:"more_info"`
 	MessageText   string `json:"message_text"`
 	MessageDate   string `json:"message_date"`
 	RequestMethod string `json:"request_method"`
@@ -70,6 +74,10 @@ func (nots *Notifications) GetBySid(notificationSid, accountSid string) (*Notifi
 
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		log.Fatalf("Expected a 200 from twilio but got a %d", resp.StatusCode)
+	}
+
 	decoder := json.NewDecoder(resp.Body)
 
 	notResponse := new(Notification)
@@ -105,6 +113,27 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 	return listResponse, err
 }
 
-func (nots *Notifications) DeleteBySid(sid string) {
+func (nots *Notifications) DeleteBySid(notificationSid string, accountSid string) {
+	// use master account if no sub account selected
+	if len(accountSid) == 0 {
+		accountSid = nots.Connection.Credentials.AccountSid
+	}
 
+	notUrl := fmt.Sprintf("Notifications/%s", url.QueryEscape(notificationSid))
+
+	resp, _ := nots.Connection.Delete(url.Values{}, accountSid, notUrl)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 204 {
+		log.Fatalf("Expected a 204 from twilio but got a %d", resp.StatusCode)
+	}
+
+	//decoder := json.NewDecoder(resp.Body)
+
+	//notResponse := new(Notification)
+
+	//err = decoder.Decode(notResponse)
+
+	//return notResponse, err
 }

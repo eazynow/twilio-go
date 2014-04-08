@@ -47,3 +47,8 @@ func (tc *TwilioConnection) Post(formValues url.Values, sid, twilioUrl string) (
 func (tc *TwilioConnection) Get(formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
 	return tc.callTwilio("GET", formValues, sid, twilioUrl)
 }
+
+// callTwilio is a function to make a DELETE call to twilio
+func (tc *TwilioConnection) Delete(formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
+	return tc.callTwilio("DELETE", formValues, sid, twilioUrl)
+}

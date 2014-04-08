@@ -26,3 +26,10 @@ type ListResponse struct {
 	PreviousPageUri string `json:"previous_page_uri"`
 	LastPageUri     string `json:"last_page_uri"`
 }
+
+type ErrorResponse struct {
+	Code     int    `json:"code"`
+	Message  string `json:"message"`
+	MoreInfo string `json:"more_info"`
+	Status   int    `json:"status"`
+}
