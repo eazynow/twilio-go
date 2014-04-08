@@ -19,6 +19,7 @@ type TwilioConnection struct {
 	NumRetries  int
 }
 
+// callTwilio is a private function that makes a http call to twilio
 func (tc *TwilioConnection) callTwilio(method string, formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
 	// req, httperr := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
 	fullUrl := fmt.Sprintf("%s/Accounts/%s/%s.json", tc.Endpoint, url.QueryEscape(sid), twilioUrl)
@@ -36,25 +37,15 @@ func (tc *TwilioConnection) callTwilio(method string, formValues url.Values, sid
 
 	c := &http.Client{}
 
-	//res, err := c.Do(req)
-	//res, err := c.Do(req)
-
-	/*if err != nil {
-		log.Fatalf("twilio-go: error doing the request: %s", err)
-	}*/
-
-	// body, callerr := ioutil.ReadAll(res.Body)
-	//response, callerr := ioutil.ReadAll(res.Body)
-
-	//fmt.Println(string(response))
-
 	return c.Do(req)
 }
 
+// callTwilio is a function to make a POST call to twilio
 func (tc *TwilioConnection) Post(formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
 	return tc.callTwilio("POST", formValues, sid, twilioUrl)
 }
 
+// callTwilio is a function to make a GET call to twilio
 func (tc *TwilioConnection) Get(formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
 	return tc.callTwilio("GET", formValues, sid, twilioUrl)
 }
