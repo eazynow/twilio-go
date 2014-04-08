@@ -2,6 +2,8 @@
 package resources
 
 import (
+	"encoding/json"
+	"log"
 	"net/url"
 )
 
@@ -60,23 +62,30 @@ func (nots *Notifications) GetBySid(sid string) Notification {
 	return n
 }
 
-func (nots *Notifications) GetList(params NotificationParams) (NotificationListResponse, error) {
+func (nots *Notifications) GetList(params NotificationParams) (*NotificationListResponse, error) {
 	if len(params.SubAccountSid) == 0 {
 		params.SubAccountSid = nots.Connection.Credentials.AccountSid
 	}
 
-	resp, status, err := nots.Connection.Get(url.Values{}, params.SubAccountSid, "Notifications")
+	resp, err := nots.Connection.Get(url.Values{}, params.SubAccountSid, "Notifications")
+
+	defer resp.Body.Close()
+
 	if err != nil {
 		log.Fatalf("Error getting notifications from twilio :%s", err)
 	}
 
-	if status != 200 {
-		log.Fatalf("Expected a 200 from twilio but got a %d", status)
+	if resp.StatusCode != 200 {
+		log.Fatalf("Expected a 200 from twilio but got a %d", resp.StatusCode)
 	}
 
 	decoder := json.NewDecoder(resp.Body)
 
-	return NotificationListResponse{}, nil
+	listReponse := new(NotificationListResponse)
+
+	err = decoder.Decode(listReponse)
+
+	return listReponse, err
 }
 
 func (nots *Notifications) DeleteBySid(sid string) {

@@ -2,7 +2,6 @@ package resources
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -20,7 +19,7 @@ type TwilioConnection struct {
 	NumRetries  int
 }
 
-func (tc *TwilioConnection) callTwilio(method string, formValues url.Values, sid, twilioUrl string) (string, int, error) {
+func (tc *TwilioConnection) callTwilio(method string, formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
 	// req, httperr := http.NewRequest(method, twilioUrl, strings.NewReader(formValues.Encode()))
 	fullUrl := fmt.Sprintf("%s/Accounts/%s/%s.json", tc.Endpoint, url.QueryEscape(sid), twilioUrl)
 
@@ -38,24 +37,24 @@ func (tc *TwilioConnection) callTwilio(method string, formValues url.Values, sid
 	c := &http.Client{}
 
 	//res, err := c.Do(req)
-	res, err := c.Do(req)
+	//res, err := c.Do(req)
 
-	if err != nil {
+	/*if err != nil {
 		log.Fatalf("twilio-go: error doing the request: %s", err)
-	}
+	}*/
 
 	// body, callerr := ioutil.ReadAll(res.Body)
-	response, callerr := ioutil.ReadAll(res.Body)
+	//response, callerr := ioutil.ReadAll(res.Body)
 
-	fmt.Println(string(response))
+	//fmt.Println(string(response))
 
-	return string(response), res.StatusCode, callerr
+	return c.Do(req)
 }
 
-func (tc *TwilioConnection) Post(formValues url.Values, sid, twilioUrl string) (string, int, error) {
+func (tc *TwilioConnection) Post(formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
 	return tc.callTwilio("POST", formValues, sid, twilioUrl)
 }
 
-func (tc *TwilioConnection) Get(formValues url.Values, sid, twilioUrl string) (string, int, error) {
+func (tc *TwilioConnection) Get(formValues url.Values, sid, twilioUrl string) (*http.Response, error) {
 	return tc.callTwilio("GET", formValues, sid, twilioUrl)
 }
