@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"net/url"
 )
 
@@ -99,7 +98,7 @@ func (nots *Notifications) Get(notificationSid, accountSid string) (*Notificatio
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, nots.returnError(resp)
+		return nil, convertToTwilioError(resp)
 	}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -125,7 +124,7 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, nots.returnError(resp)
+		return nil, convertToTwilioError(resp)
 	}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -150,20 +149,8 @@ func (nots *Notifications) Delete(notificationSid string, accountSid string) err
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 204 {
-		return nots.returnError(resp)
+		return convertToTwilioError(resp)
 	}
 
 	return nil
-}
-
-func (nots *Notifications) returnError(resp *http.Response) error {
-	decoder := json.NewDecoder(resp.Body)
-
-	twilioErr := new(TwilioError)
-
-	err := decoder.Decode(twilioErr)
-	if err == nil {
-		err = twilioErr
-	}
-	return err
 }

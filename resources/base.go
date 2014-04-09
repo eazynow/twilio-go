@@ -1,7 +1,9 @@
 package resources
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 )
@@ -54,4 +56,16 @@ type TwilioError struct {
 
 func (te *TwilioError) Error() string {
 	return fmt.Sprintf("Twilio Error: (%d) %s", te.Code, te.Message)
+}
+
+func convertToTwilioError(resp *http.Response) error {
+	decoder := json.NewDecoder(resp.Body)
+
+	twilioErr := new(TwilioError)
+
+	err := decoder.Decode(twilioErr)
+	if err == nil {
+		err = twilioErr
+	}
+	return err
 }
