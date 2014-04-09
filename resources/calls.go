@@ -24,10 +24,11 @@ type Call struct {
 	ForwardedFrom  string `json:"forwarded_from"`
 	GroupSid       string `json:"group_sid"`
 	CallerName     string `json:"caller_name"`
+	//TODO: Sort these out - probably easy KV pair of some sort
 	//SubResourceUris  string `json:"to"`
 	//      "subresource_uris": {
 	//        "notifications": "/2010-04-01/Accounts/AC1ab10b47c2bb2d804d3dcee408ddf8ce/Calls/CA70c0075ac7b91a28b6dbbe9fe1dd1e19/Notifications.json",
-	//        "recordings": "/2010-04-01/
+	//        "recordings": "/2010-04-01/"
 }
 
 // CallListResponse represents the response from twilio for a list of calls
