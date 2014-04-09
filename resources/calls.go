@@ -142,6 +142,21 @@ func (calls *Calls) GetList(params CallParams) (*CallListResponse, error) {
 }
 
 func (calls *Calls) Delete(callSid, accountSid string) error {
+	// use master account if no sub account selected
+	if len(accountSid) == 0 {
+		accountSid = calls.Connection.Credentials.AccountSid
+	}
+
+	callUrl := fmt.Sprintf("Calls/%s", url.QueryEscape(callSid))
+
+	resp, _ := calls.Connection.Delete(url.Values{}, accountSid, callUrl)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 204 {
+		return convertToTwilioError(resp)
+	}
+
 	return nil
 }
 
