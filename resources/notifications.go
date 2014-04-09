@@ -83,11 +83,11 @@ func (nots *Notifications) Get(notificationSid, accountSid string) (*Notificatio
 
 	decoder := json.NewDecoder(resp.Body)
 
-	notResponse := new(Notification)
+	response := new(Notification)
 
-	err = decoder.Decode(notResponse)
+	err = decoder.Decode(response)
 
-	return notResponse, err
+	return response, err
 }
 
 // getNotifications is a private function that returns notifications based on parameters

@@ -1,6 +1,8 @@
 package resources
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/url"
 )
 
@@ -81,7 +83,28 @@ type Calls struct {
 }
 
 func (calls *Calls) Get(callSid, accountSid string) (*Call, error) {
-	return nil, nil
+	// use master account if no sub account selected
+	if len(accountSid) == 0 {
+		accountSid = calls.Connection.Credentials.AccountSid
+	}
+
+	notUrl := fmt.Sprintf("Calls/%s", url.QueryEscape(callSid))
+
+	resp, err := calls.Connection.Get(url.Values{}, accountSid, notUrl)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, convertToTwilioError(resp)
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+
+	response := new(Call)
+
+	err = decoder.Decode(response)
+
+	return response, err
 }
 
 func (calls *Calls) GetList(params CallParams) (*CallListResponse, error) {
