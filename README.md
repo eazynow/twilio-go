@@ -1,6 +1,8 @@
 ## Overview
 This is a golang library to interact with [Twilio](http://www.twilio.com).
 
+**This is currently being written. As soon as sections are completed I will add examples**
+
 ## License
 The majority of the software was written by Erol Ziya and is released under an MIT License.
 
