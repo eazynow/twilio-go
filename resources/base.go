@@ -5,10 +5,6 @@ import (
 	"strconv"
 )
 
-// A REST resource
-type Resource struct {
-}
-
 // The object representation of an instance response of twilio api
 type InstanceResource struct {
 	Resource
@@ -23,10 +19,10 @@ func (pp *PagingParams) AsValues() url.Values {
 	queryVals := url.Values{}
 
 	if pp.PageSize > 0 {
-		queryVals.Add("PageSize", strconv.Itoa(pp.PageSize))
+		addParam(&queryVals, "PageSize", strconv.Itoa(pp.PageSize))
 	}
 
-	queryVals.Add("Page", strconv.Itoa(pp.Page))
+	addParam(&queryVals, "Page", strconv.Itoa(pp.Page))
 
 	return queryVals
 }
@@ -42,4 +38,20 @@ type ListResponse struct {
 	NextPageUri     string `json:"next_page_uri"`
 	PreviousPageUri string `json:"previous_page_uri"`
 	LastPageUri     string `json:"last_page_uri"`
+}
+
+// A REST resource
+type Resource struct {
+	Sid         string `json:"sid"`
+	AccountSid  string `json:"account_sid"`
+	DateCreated string `json:"date_created"`
+	DateUpdated string `json:"date_updated"`
+	Uri         string `json:"uri"`
+	ApiVersion  string `json:"api_version"`
+}
+
+func addParam(params *url.Values, pName, pValue string) {
+	if len(pValue) > 0 {
+		params.Add(pName, pValue)
+	}
 }

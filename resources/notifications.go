@@ -8,15 +8,10 @@ import (
 	"net/url"
 )
 
-type NotificationResponse struct {
-}
-
 // NotificationBasic represents the core fields relating to a twilio notification.
 // This is a subset of the full Notification object to reduce size in list responses.
 type NotificationBasic struct {
-	NotificationResponse
-	Sid           string `json:"sid"`
-	AccountSid    string `json:"account_sid"`
+	Resource
 	CallSid       string `json:"call_sid"`
 	Log           string `json:"log"`
 	ErrorCode     string `json:"error_code"`
@@ -24,10 +19,6 @@ type NotificationBasic struct {
 	MessageDate   string `json:"message_date"`
 	RequestMethod string `json:"request_method"`
 	RequestUrl    string `json:"request_url"`
-	DateCreated   string `json:"date_created"`
-	ApiVersion    string `json:"api_version"`
-	DateUpdated   string `json:"date_updated"`
-	Uri           string `json:"uri"`
 }
 
 // Notification represents a twilio notification in detail
@@ -52,22 +43,10 @@ type NotificationParams struct {
 func (np *NotificationParams) AsValues() url.Values {
 
 	queryVals := np.PagingParams.AsValues()
-
-	if len(np.Date) > 0 {
-		queryVals.Add("MessageDate", np.Date)
-	}
-
-	if len(np.DateFrom) > 0 {
-		queryVals.Add("MessageDate>", np.DateFrom)
-	}
-
-	if len(np.DateTo) > 0 {
-		queryVals.Add("MessageDate<", np.DateTo)
-	}
-
-	if len(np.LogLevel) > 0 {
-		queryVals.Add("Log", np.LogLevel)
-	}
+	addParam(&queryVals, "MessageDate", np.Date)
+	addParam(&queryVals, "MessageDate>", np.DateFrom)
+	addParam(&queryVals, "MessageDate<", np.DateTo)
+	addParam(&queryVals, "Log", np.LogLevel)
 
 	return queryVals
 }
