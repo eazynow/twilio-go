@@ -54,9 +54,6 @@ type CallListResponse struct {
 	List []Call `json:"calls"`
 }
 
-type CallRecordingListResponse struct {
-}
-
 type CallParams struct {
 	PagingParams
 	SubAccountSid string
@@ -168,8 +165,12 @@ func (calls *Calls) Update(callSid, method, status string) (*Call, error) {
 	return nil, nil
 }
 
-func (calls *Calls) GetRecordingList(callSid, accountSid string) (*CallRecordingListResponse, error) {
-	return nil, nil
+func (calls *Calls) GetRecordingList(callSid string, params RecordingParams) (*RecordingListResponse, error) {
+	if len(callSid) > 0 {
+		// override anything in the params
+		params.CallSid = callSid
+	}
+	return getRecordings(calls.Connection, params)
 }
 
 func (calls *Calls) GetNotificationList(callSid string, params NotificationParams) (*NotificationListResponse, error) {
