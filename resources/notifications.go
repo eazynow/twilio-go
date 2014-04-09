@@ -46,8 +46,9 @@ type NotificationParams struct {
 	PagingParams
 	SubAccountSid string
 	LogLevel      string //log level needs to be string as 0 is a valid level in twilio
-	DateAfter     string
-	DateBefore    string
+	Date          string
+	DateFrom      string
+	DateTo        string
 }
 
 // NotificationListResponse represents the response from twilio for a list of notifications
@@ -98,6 +99,20 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 	if params.PageSize > 0 {
 		queryVals.Add("PageSize", strconv.Itoa(params.PageSize))
 	}
+
+	if len(params.Date) > 0 {
+		queryVals.Add("MessageDate", params.Date)
+	}
+
+	if len(params.DateFrom) > 0 {
+		queryVals.Add("MessageDate>", params.DateFrom)
+	}
+
+	if len(params.DateTo) > 0 {
+		queryVals.Add("MessageDate<", params.DateTo)
+	}
+
+	queryVals.Add("Page", strconv.Itoa(params.Page))
 
 	resp, err := nots.Connection.Get(queryVals, params.SubAccountSid, "Notifications")
 

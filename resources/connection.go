@@ -26,7 +26,7 @@ func (tc *TwilioConnection) callTwilio(method string, formValues url.Values, sid
 
 	req, err := http.NewRequest(method, fullUrl, strings.NewReader(formValues.Encode()))
 
-	fmt.Println(req.URL.String())
+	log.Println(req.URL.String())
 
 	if err != nil {
 		log.Fatalf("twilio-go: error building request: %s", err)
