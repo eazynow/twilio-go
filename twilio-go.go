@@ -13,6 +13,7 @@ type TwilioRestClient struct {
 	Connection    *resources.TwilioConnection
 	NumRetries    int
 	Notifications resources.Notifications
+	Calls         resources.Calls
 }
 
 func NewTwilioRestClient(sid, token string) *TwilioRestClient {
@@ -38,13 +39,18 @@ func NewTwilioRestClient(sid, token string) *TwilioRestClient {
 		NumRetries:  retries,
 	}
 
-	tnot := resources.Notifications{
+	tnots := resources.Notifications{
+		Connection: &tcon,
+	}
+
+	tcalls := resources.Calls{
 		Connection: &tcon,
 	}
 
 	return &TwilioRestClient{
 		Connection:    &tcon,
-		Notifications: tnot,
+		Notifications: tnots,
+		Calls:         tcalls,
 		NumRetries:    retries}
 }
 
