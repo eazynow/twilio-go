@@ -33,6 +33,7 @@ type Notification struct {
 // when calling the Notifications list object
 type NotificationParams struct {
 	PagingParams
+	CallSid       string
 	SubAccountSid string
 	LogLevel      string //log level needs to be string as 0 is a valid level in twilio
 	Date          string
@@ -89,12 +90,21 @@ func (nots *Notifications) Get(notificationSid, accountSid string) (*Notificatio
 	return notResponse, err
 }
 
-func (nots *Notifications) GetList(params NotificationParams) (*NotificationListResponse, error) {
+// getNotifications is a private function that returns notifications based on parameters
+func getNotifications(con *TwilioConnection, params NotificationParams) (*NotificationListResponse, error) {
 	if len(params.SubAccountSid) == 0 {
-		params.SubAccountSid = nots.Connection.Credentials.AccountSid
+		params.SubAccountSid = con.Credentials.AccountSid
 	}
 
-	resp, err := nots.Connection.Get(params.AsValues(), params.SubAccountSid, "Notifications")
+	var resource string
+
+	if len(params.CallSid) > 0 {
+		resource = fmt.Sprintf("Calls/%s/", url.QueryEscape(params.CallSid))
+	}
+
+	resource += "Notifications"
+
+	resp, err := con.Get(params.AsValues(), params.SubAccountSid, resource)
 
 	defer resp.Body.Close()
 
@@ -113,6 +123,10 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 	err = decoder.Decode(listResponse)
 
 	return listResponse, err
+}
+
+func (nots *Notifications) GetList(params NotificationParams) (*NotificationListResponse, error) {
+	return getNotifications(nots.Connection, params)
 }
 
 func (nots *Notifications) Delete(notificationSid string, accountSid string) error {

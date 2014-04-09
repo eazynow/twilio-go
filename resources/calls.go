@@ -31,10 +31,27 @@ type Call struct {
 	//        "recordings": "/2010-04-01/"
 }
 
+// func (call *Call) GetNotificationList(params NotificationParams) (*NotificationListResponse, error) {
+// 	if len(call.Sid) > 0 {
+// 		params.CallSid = call.Sid
+// 	}
+// 	return getNotifications(call.Connection, params)
+// }
+
+// func (calls *Calls) GetRecordingList(params RecordingParams) (*CallRecordingListResponse, error) {
+// 	if len(call.Sid) > 0 {
+// 		params.CallSid = call.Sid
+// 	}
+// 	return getRecordings(calls.Connection, params)
+// }
+
 // CallListResponse represents the response from twilio for a list of calls
 type CallListResponse struct {
 	ListResponse
 	List []Call `json:"calls"`
+}
+
+type CallRecordingListResponse struct {
 }
 
 type CallParams struct {
@@ -56,4 +73,40 @@ func (cp *CallParams) AsValues() url.Values {
 	addParam(&queryVals, "Status", cp.Status)
 
 	return queryVals
+}
+
+type Calls struct {
+	Name       string
+	Connection *TwilioConnection
+}
+
+func (calls *Calls) Get(callSid, accountSid string) (*Call, error) {
+	return nil, nil
+}
+
+func (calls *Calls) GetList(params CallParams) (*CallListResponse, error) {
+	return nil, nil
+}
+
+func (calls *Calls) Delete(callSid, accountSid string) error {
+	return nil
+}
+
+func (calls *Calls) Create() error {
+	return nil
+}
+
+func (calls *Calls) Update(callSid, method, status string) (*Call, error) {
+	return nil, nil
+}
+
+func (calls *Calls) GetRecordingList(callSid, accountSid string) (*CallRecordingListResponse, error) {
+	return nil, nil
+}
+
+func (calls *Calls) GetNotificationList(callSid string, params NotificationParams) (*NotificationListResponse, error) {
+	if len(callSid) > 0 {
+		params.CallSid = callSid
+	}
+	return getNotifications(calls.Connection, params)
 }
