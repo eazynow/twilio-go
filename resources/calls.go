@@ -3,6 +3,7 @@ package resources
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
 )
 
@@ -58,6 +59,7 @@ type CallRecordingListResponse struct {
 
 type CallParams struct {
 	PagingParams
+	SubAccountSid string
 	From          string
 	To            string
 	StartTime     string
@@ -107,8 +109,36 @@ func (calls *Calls) Get(callSid, accountSid string) (*Call, error) {
 	return response, err
 }
 
+func getCalls(con *TwilioConnection, params CallParams) (*CallListResponse, error) {
+	if len(params.SubAccountSid) == 0 {
+		params.SubAccountSid = con.Credentials.AccountSid
+	}
+
+	resource := "Calls"
+
+	resp, err := con.Get(params.AsValues(), params.SubAccountSid, resource)
+
+	defer resp.Body.Close()
+
+	if err != nil {
+		log.Fatalf("Error getting calls from twilio :%s", err)
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, convertToTwilioError(resp)
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+
+	listResponse := new(CallListResponse)
+
+	err = decoder.Decode(listResponse)
+
+	return listResponse, err
+}
+
 func (calls *Calls) GetList(params CallParams) (*CallListResponse, error) {
-	return nil, nil
+	return getCalls(calls.Connection, params)
 }
 
 func (calls *Calls) Delete(callSid, accountSid string) error {
