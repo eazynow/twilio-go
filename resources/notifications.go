@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 type NotificationResponse struct {
@@ -61,7 +62,7 @@ type Notifications struct {
 	Connection *TwilioConnection
 }
 
-func (nots *Notifications) GetBySid(notificationSid, accountSid string) (*Notification, error) {
+func (nots *Notifications) Get(notificationSid, accountSid string) (*Notification, error) {
 
 	// use master account if no sub account selected
 	if len(accountSid) == 0 {
@@ -92,7 +93,13 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 		params.SubAccountSid = nots.Connection.Credentials.AccountSid
 	}
 
-	resp, err := nots.Connection.Get(url.Values{}, params.SubAccountSid, "Notifications")
+	queryVals := url.Values{}
+
+	if params.PageSize > 0 {
+		queryVals.Add("PageSize", strconv.Itoa(params.PageSize))
+	}
+
+	resp, err := nots.Connection.Get(queryVals, params.SubAccountSid, "Notifications")
 
 	defer resp.Body.Close()
 
@@ -113,7 +120,7 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 	return listResponse, err
 }
 
-func (nots *Notifications) DeleteBySid(notificationSid string, accountSid string) error {
+func (nots *Notifications) Delete(notificationSid string, accountSid string) error {
 	// use master account if no sub account selected
 	if len(accountSid) == 0 {
 		accountSid = nots.Connection.Credentials.AccountSid
