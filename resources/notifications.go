@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type NotificationResponse struct {
@@ -49,6 +48,25 @@ type NotificationParams struct {
 	Date          string
 	DateFrom      string
 	DateTo        string
+}
+
+func (np *NotificationParams) AsValues() url.Values {
+
+	queryVals := np.PagingParams.AsValues()
+
+	if len(np.Date) > 0 {
+		queryVals.Add("MessageDate", np.Date)
+	}
+
+	if len(np.DateFrom) > 0 {
+		queryVals.Add("MessageDate>", np.DateFrom)
+	}
+
+	if len(np.DateTo) > 0 {
+		queryVals.Add("MessageDate<", np.DateTo)
+	}
+
+	return queryVals
 }
 
 // NotificationListResponse represents the response from twilio for a list of notifications
@@ -94,27 +112,7 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 		params.SubAccountSid = nots.Connection.Credentials.AccountSid
 	}
 
-	queryVals := url.Values{}
-
-	if params.PageSize > 0 {
-		queryVals.Add("PageSize", strconv.Itoa(params.PageSize))
-	}
-
-	if len(params.Date) > 0 {
-		queryVals.Add("MessageDate", params.Date)
-	}
-
-	if len(params.DateFrom) > 0 {
-		queryVals.Add("MessageDate>", params.DateFrom)
-	}
-
-	if len(params.DateTo) > 0 {
-		queryVals.Add("MessageDate<", params.DateTo)
-	}
-
-	queryVals.Add("Page", strconv.Itoa(params.Page))
-
-	resp, err := nots.Connection.Get(queryVals, params.SubAccountSid, "Notifications")
+	resp, err := nots.Connection.Get(params.AsValues(), params.SubAccountSid, "Notifications")
 
 	defer resp.Body.Close()
 

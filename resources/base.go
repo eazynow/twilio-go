@@ -1,6 +1,10 @@
 package resources
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+	"strconv"
+)
 
 // A REST resource
 type Resource struct {
@@ -14,6 +18,18 @@ type InstanceResource struct {
 type PagingParams struct {
 	PageSize int `json:"page_size"`
 	Page     int `json:"page"`
+}
+
+func (pp *PagingParams) AsValues() url.Values {
+	queryVals := url.Values{}
+
+	if pp.PageSize > 0 {
+		queryVals.Add("PageSize", strconv.Itoa(pp.PageSize))
+	}
+
+	queryVals.Add("Page", strconv.Itoa(pp.Page))
+
+	return queryVals
 }
 
 type ListResponse struct {
