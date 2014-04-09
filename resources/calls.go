@@ -106,6 +106,7 @@ func (calls *Calls) GetRecordingList(callSid, accountSid string) (*CallRecording
 
 func (calls *Calls) GetNotificationList(callSid string, params NotificationParams) (*NotificationListResponse, error) {
 	if len(callSid) > 0 {
+		// override anything in the params
 		params.CallSid = callSid
 	}
 	return getNotifications(calls.Connection, params)
