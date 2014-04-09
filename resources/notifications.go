@@ -66,6 +66,10 @@ func (np *NotificationParams) AsValues() url.Values {
 		queryVals.Add("MessageDate<", np.DateTo)
 	}
 
+	if len(np.LogLevel) > 0 {
+		queryVals.Add("Log", np.LogLevel)
+	}
+
 	return queryVals
 }
 
