@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"strconv"
 )
 
 type Call struct {
@@ -52,6 +53,36 @@ type Call struct {
 type CallListResponse struct {
 	ListResponse
 	List []Call `json:"calls"`
+}
+
+type CallSetupParams struct {
+	Method               string
+	FallbackUrl          string
+	FallbackMethod       string
+	StatusCallback       string
+	StatusCallbackMethod string
+	SendDigits           string
+	IfMachine            string
+	Timeout              int
+	Record               bool
+	SubAccountSid        string
+}
+
+func (csp *CallSetupParams) AsValues() url.Values {
+	queryVals := url.Values{}
+
+	addParam(&queryVals, "Method", csp.Method)
+	addParam(&queryVals, "FallbackUrl", csp.FallbackUrl)
+	addParam(&queryVals, "FallbackMethod", csp.FallbackMethod)
+	addParam(&queryVals, "StatusCallback", csp.StatusCallback)
+	addParam(&queryVals, "StatusCallbackMethod", csp.StatusCallbackMethod)
+	addParam(&queryVals, "SendDigits", csp.SendDigits)
+	addParam(&queryVals, "IfMachine", csp.IfMachine)
+	addParam(&queryVals, "Timeout", strconv.Itoa(csp.Timeout))
+	addParam(&queryVals, "Record", strconv.FormatBool(csp.Record))
+	addParam(&queryVals, "SubAccountSid", csp.SubAccountSid)
+
+	return queryVals
 }
 
 type CallParams struct {
@@ -157,8 +188,26 @@ func (calls *Calls) Delete(callSid, accountSid string) error {
 	return nil
 }
 
-func (calls *Calls) Create() error {
-	return nil
+func (calls *Calls) Create(from, to string, params CallSetupParams) (*Call, error) {
+	if len(params.SubAccountSid) == 0 {
+		params.SubAccountSid = calls.Connection.Credentials.AccountSid
+	}
+
+	resource := "Calls"
+
+	resp, err := calls.Connection.Post(params.AsValues(), params.SubAccountSid, resource)
+
+	if resp.StatusCode != 201 {
+		return nil, convertToTwilioError(resp)
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+
+	callResponse := new(Call)
+
+	err = decoder.Decode(callResponse)
+
+	return callResponse, err
 }
 
 func (calls *Calls) Update(callSid, method, status string) (*Call, error) {
