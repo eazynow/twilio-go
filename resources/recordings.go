@@ -109,3 +109,22 @@ func (recs *Recordings) Get(recordingSid, accountSid string) (*Recording, error)
 func (recs *Recordings) GetList(params RecordingParams) (*RecordingListResponse, error) {
 	return getRecordings(recs.Connection, params)
 }
+
+func (recs *Recordings) Delete(sid string, accountSid string) error {
+	// use master account if no sub account selected
+	if len(accountSid) == 0 {
+		accountSid = nots.Connection.Credentials.AccountSid
+	}
+
+	theUrl := fmt.Sprintf("Recordings/%s", url.QueryEscape(sid))
+
+	resp, _ := recs.Connection.Delete(url.Values{}, accountSid, theUrl)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 204 {
+		return convertToTwilioError(resp)
+	}
+
+	return nil
+}
