@@ -42,10 +42,6 @@ type Transcriptions struct {
 
 // getRecordings is a private function that returns notifications based on parameters
 func getTranscriptions(con *TwilioConnection, params TranscriptionParams) (*TranscriptionListResponse, error) {
-	if len(params.SubAccountSid) == 0 {
-		params.SubAccountSid = con.Credentials.AccountSid
-	}
-
 	var resource string
 
 	if len(params.RecordingSid) > 0 {
@@ -80,12 +76,6 @@ func (res *Transcriptions) GetList(params TranscriptionParams) (*TranscriptionLi
 }
 
 func (res *Transcriptions) Get(transcriptionSid, accountSid string) (*Transcription, error) {
-
-	// use master account if no sub account selected
-	if len(accountSid) == 0 {
-		accountSid = res.Connection.Credentials.AccountSid
-	}
-
 	recUrl := fmt.Sprintf("Transcriptions/%s", url.QueryEscape(transcriptionSid))
 
 	resp, err := res.Connection.Get(url.Values{}, accountSid, recUrl)

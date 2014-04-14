@@ -35,10 +35,6 @@ type Queues struct {
 }
 
 func (res *Queues) GetList(params QueueParams) (*QueueListResponse, error) {
-	if len(params.SubAccountSid) == 0 {
-		params.SubAccountSid = res.Connection.Credentials.AccountSid
-	}
-
 	resource := "Queues"
 
 	resp, err := res.Connection.Get(params.AsValues(), params.SubAccountSid, resource)
@@ -64,9 +60,6 @@ func (res *Queues) GetList(params QueueParams) (*QueueListResponse, error) {
 
 func (res *Queues) Get(queueSid, accountSid string) (*Queue, error) {
 	// use master account if no sub account selected
-	if len(accountSid) == 0 {
-		accountSid = res.Connection.Credentials.AccountSid
-	}
 
 	theUrl := fmt.Sprintf("Queues/%s", url.QueryEscape(queueSid))
 
@@ -85,4 +78,20 @@ func (res *Queues) Get(queueSid, accountSid string) (*Queue, error) {
 	err = decoder.Decode(response)
 
 	return response, err
+}
+
+func (res *Queues) Delete(sid string, accountSid string) error {
+	// use master account if no sub account selected
+
+	theUrl := fmt.Sprintf("Queues/%s", url.QueryEscape(sid))
+
+	resp, _ := res.Connection.Delete(url.Values{}, accountSid, theUrl)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 204 {
+		return convertToTwilioError(resp)
+	}
+
+	return nil
 }

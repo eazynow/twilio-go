@@ -47,10 +47,6 @@ type Recordings struct {
 
 // getRecordings is a private function that returns notifications based on parameters
 func getRecordings(con *TwilioConnection, params RecordingParams) (*RecordingListResponse, error) {
-	if len(params.SubAccountSid) == 0 {
-		params.SubAccountSid = con.Credentials.AccountSid
-	}
-
 	var resource string
 
 	if len(params.CallSid) > 0 {
@@ -82,11 +78,6 @@ func getRecordings(con *TwilioConnection, params RecordingParams) (*RecordingLis
 
 func (recs *Recordings) Get(recordingSid, accountSid string) (*Recording, error) {
 
-	// use master account if no sub account selected
-	if len(accountSid) == 0 {
-		accountSid = recs.Connection.Credentials.AccountSid
-	}
-
 	recUrl := fmt.Sprintf("Recordings/%s", url.QueryEscape(recordingSid))
 
 	resp, err := recs.Connection.Get(url.Values{}, accountSid, recUrl)
@@ -111,10 +102,6 @@ func (recs *Recordings) GetList(params RecordingParams) (*RecordingListResponse,
 }
 
 func (recs *Recordings) Delete(sid string, accountSid string) error {
-	// use master account if no sub account selected
-	if len(accountSid) == 0 {
-		accountSid = recs.Connection.Credentials.AccountSid
-	}
 
 	theUrl := fmt.Sprintf("Recordings/%s", url.QueryEscape(sid))
 
@@ -130,9 +117,5 @@ func (recs *Recordings) Delete(sid string, accountSid string) error {
 }
 
 func (recs *Recordings) GetTranscriptionsList(recordingSid string, params TranscriptionParams) (*TranscriptionListResponse, error) {
-	if len(recordingSid) > 0 {
-		// override anything in the params
-		params.RecordingSid = recordingSid
-	}
 	return getTranscriptions(recs.Connection, params)
 }

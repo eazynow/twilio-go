@@ -128,11 +128,6 @@ type Calls struct {
 }
 
 func (calls *Calls) Get(callSid, accountSid string) (*Call, error) {
-	// use master account if no sub account selected
-	if len(accountSid) == 0 {
-		accountSid = calls.Connection.Credentials.AccountSid
-	}
-
 	notUrl := fmt.Sprintf("Calls/%s", url.QueryEscape(callSid))
 
 	resp, err := calls.Connection.Get(url.Values{}, accountSid, notUrl)
@@ -153,10 +148,6 @@ func (calls *Calls) Get(callSid, accountSid string) (*Call, error) {
 }
 
 func getCalls(con *TwilioConnection, params CallParams) (*CallListResponse, error) {
-	if len(params.SubAccountSid) == 0 {
-		params.SubAccountSid = con.Credentials.AccountSid
-	}
-
 	resource := "Calls"
 
 	resp, err := con.Get(params.AsValues(), params.SubAccountSid, resource)
@@ -185,11 +176,6 @@ func (calls *Calls) GetList(params CallParams) (*CallListResponse, error) {
 }
 
 func (calls *Calls) Delete(callSid, accountSid string) error {
-	// use master account if no sub account selected
-	if len(accountSid) == 0 {
-		accountSid = calls.Connection.Credentials.AccountSid
-	}
-
 	callUrl := fmt.Sprintf("Calls/%s", url.QueryEscape(callSid))
 
 	resp, _ := calls.Connection.Delete(url.Values{}, accountSid, callUrl)
@@ -204,10 +190,6 @@ func (calls *Calls) Delete(callSid, accountSid string) error {
 }
 
 func (calls *Calls) Create(from, to string, params CallSetupParams) (*Call, error) {
-	if len(params.SubAccountSid) == 0 {
-		params.SubAccountSid = calls.Connection.Credentials.AccountSid
-	}
-
 	callParams := params.AsValues()
 
 	addParam(&callParams, "From", from)
@@ -231,9 +213,6 @@ func (calls *Calls) Create(from, to string, params CallSetupParams) (*Call, erro
 }
 
 func (calls *Calls) Update(callSid string, params CallModifyParams) (*Call, error) {
-	if len(params.SubAccountSid) == 0 {
-		params.SubAccountSid = calls.Connection.Credentials.AccountSid
-	}
 
 	callParams := params.AsValues()
 

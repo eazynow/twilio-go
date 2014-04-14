@@ -65,12 +65,6 @@ type Notifications struct {
 }
 
 func (nots *Notifications) Get(notificationSid, accountSid string) (*Notification, error) {
-
-	// use master account if no sub account selected
-	if len(accountSid) == 0 {
-		accountSid = nots.Connection.Credentials.AccountSid
-	}
-
 	notUrl := fmt.Sprintf("Notifications/%s", url.QueryEscape(notificationSid))
 
 	resp, err := nots.Connection.Get(url.Values{}, accountSid, notUrl)
@@ -92,10 +86,6 @@ func (nots *Notifications) Get(notificationSid, accountSid string) (*Notificatio
 
 // getNotifications is a private function that returns notifications based on parameters
 func getNotifications(con *TwilioConnection, params NotificationParams) (*NotificationListResponse, error) {
-	if len(params.SubAccountSid) == 0 {
-		params.SubAccountSid = con.Credentials.AccountSid
-	}
-
 	var resource string
 
 	if len(params.CallSid) > 0 {
@@ -130,10 +120,6 @@ func (nots *Notifications) GetList(params NotificationParams) (*NotificationList
 }
 
 func (nots *Notifications) Delete(notificationSid string, accountSid string) error {
-	// use master account if no sub account selected
-	if len(accountSid) == 0 {
-		accountSid = nots.Connection.Credentials.AccountSid
-	}
 
 	notUrl := fmt.Sprintf("Notifications/%s", url.QueryEscape(notificationSid))
 
