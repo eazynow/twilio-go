@@ -55,32 +55,47 @@ type CallListResponse struct {
 	List []Call `json:"calls"`
 }
 
-type CallSetupParams struct {
+type CallModifyParams struct {
+	Url                  string
 	Method               string
+	Status               string
 	FallbackUrl          string
 	FallbackMethod       string
 	StatusCallback       string
 	StatusCallbackMethod string
-	SendDigits           string
-	IfMachine            string
-	Timeout              int
-	Record               bool
 	SubAccountSid        string
 }
 
-func (csp *CallSetupParams) AsValues() url.Values {
+func (cmp *CallModifyParams) AsValues() url.Values {
 	queryVals := url.Values{}
 
-	addParam(&queryVals, "Method", csp.Method)
-	addParam(&queryVals, "FallbackUrl", csp.FallbackUrl)
-	addParam(&queryVals, "FallbackMethod", csp.FallbackMethod)
-	addParam(&queryVals, "StatusCallback", csp.StatusCallback)
-	addParam(&queryVals, "StatusCallbackMethod", csp.StatusCallbackMethod)
+	addParam(&queryVals, "Url", cmp.Url)
+	addParam(&queryVals, "Method", cmp.Method)
+	addParam(&queryVals, "Status", cmp.Status)
+	addParam(&queryVals, "FallbackUrl", cmp.FallbackUrl)
+	addParam(&queryVals, "FallbackMethod", cmp.FallbackMethod)
+	addParam(&queryVals, "StatusCallback", cmp.StatusCallback)
+	addParam(&queryVals, "StatusCallbackMethod", cmp.StatusCallbackMethod)
+	addParam(&queryVals, "SubAccountSid", cmp.SubAccountSid)
+
+	return queryVals
+}
+
+type CallSetupParams struct {
+	CallModifyParams
+	SendDigits string
+	IfMachine  string
+	Timeout    int
+	Record     bool
+}
+
+func (csp *CallSetupParams) AsValues() url.Values {
+	queryVals := csp.CallModifyParams.AsValues()
+
 	addParam(&queryVals, "SendDigits", csp.SendDigits)
 	addParam(&queryVals, "IfMachine", csp.IfMachine)
 	addParam(&queryVals, "Timeout", strconv.Itoa(csp.Timeout))
 	addParam(&queryVals, "Record", strconv.FormatBool(csp.Record))
-	addParam(&queryVals, "SubAccountSid", csp.SubAccountSid)
 
 	return queryVals
 }
@@ -193,9 +208,14 @@ func (calls *Calls) Create(from, to string, params CallSetupParams) (*Call, erro
 		params.SubAccountSid = calls.Connection.Credentials.AccountSid
 	}
 
+	callParams := params.AsValues()
+
+	addParam(&callParams, "From", from)
+	addParam(&callParams, "To", from)
+
 	resource := "Calls"
 
-	resp, err := calls.Connection.Post(params.AsValues(), params.SubAccountSid, resource)
+	resp, err := calls.Connection.Post(callParams, params.SubAccountSid, resource)
 
 	if resp.StatusCode != 201 {
 		return nil, convertToTwilioError(resp)
@@ -210,8 +230,28 @@ func (calls *Calls) Create(from, to string, params CallSetupParams) (*Call, erro
 	return callResponse, err
 }
 
-func (calls *Calls) Update(callSid, method, status string) (*Call, error) {
-	return nil, nil
+func (calls *Calls) Update(callSid string, params CallModifyParams) (*Call, error) {
+	if len(params.SubAccountSid) == 0 {
+		params.SubAccountSid = calls.Connection.Credentials.AccountSid
+	}
+
+	callParams := params.AsValues()
+
+	resource := fmt.Sprintf("Calls/%s", url.QueryEscape(callSid))
+
+	resp, err := calls.Connection.Post(callParams, params.SubAccountSid, resource)
+
+	if resp.StatusCode != 200 {
+		return nil, convertToTwilioError(resp)
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+
+	callResponse := new(Call)
+
+	err = decoder.Decode(callResponse)
+
+	return callResponse, err
 }
 
 func (calls *Calls) GetRecordingList(callSid string, params RecordingParams) (*RecordingListResponse, error) {
