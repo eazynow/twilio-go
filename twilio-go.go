@@ -16,6 +16,7 @@ type TwilioRestClient struct {
 	Calls          resources.Calls
 	Recordings     resources.Recordings
 	Transcriptions resources.Transcriptions
+	Queues         resources.Queues
 }
 
 func NewTwilioRestClient(sid, token string) *TwilioRestClient {
@@ -42,6 +43,7 @@ func NewTwilioRestClient(sid, token string) *TwilioRestClient {
 		Calls:          resources.Calls{Connection: &tcon},
 		Recordings:     resources.Recordings{Connection: &tcon},
 		Transcriptions: resources.Transcriptions{Connection: &tcon},
+		Queues:         resources.Queues{Connection: &tcon},
 		NumRetries:     retries}
 }
 
