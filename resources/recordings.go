@@ -113,7 +113,7 @@ func (recs *Recordings) GetList(params RecordingParams) (*RecordingListResponse,
 func (recs *Recordings) Delete(sid string, accountSid string) error {
 	// use master account if no sub account selected
 	if len(accountSid) == 0 {
-		accountSid = nots.Connection.Credentials.AccountSid
+		accountSid = recs.Connection.Credentials.AccountSid
 	}
 
 	theUrl := fmt.Sprintf("Recordings/%s", url.QueryEscape(sid))
@@ -127,4 +127,12 @@ func (recs *Recordings) Delete(sid string, accountSid string) error {
 	}
 
 	return nil
+}
+
+func (recs *Recordings) GetTranscriptionsList(recordingSid string, params TranscriptionParams) (*TranscriptionListResponse, error) {
+	if len(recordingSid) > 0 {
+		// override anything in the params
+		params.RecordingSid = recordingSid
+	}
+	return getTranscriptions(recs.Connection, params)
 }
