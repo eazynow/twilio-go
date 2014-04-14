@@ -7,7 +7,15 @@ import (
 	"net/url"
 )
 
+type Recording struct {
+	Resource
+	CallSid  string `json:"call_sid"`
+	Duration string `json:"duration"`
+}
+
 type RecordingListResponse struct {
+	ListResponse
+	List []Recording `json:"recordings"`
 }
 
 // NotificationParams represents the query parameters that can be used
@@ -30,6 +38,11 @@ func (np *RecordingParams) AsValues() url.Values {
 	addParam(&queryVals, "DateCreated<", np.DateTo)
 
 	return queryVals
+}
+
+type Recordings struct {
+	Name       string
+	Connection *TwilioConnection
 }
 
 // getRecordings is a private function that returns notifications based on parameters
@@ -65,4 +78,34 @@ func getRecordings(con *TwilioConnection, params RecordingParams) (*RecordingLis
 	err = decoder.Decode(listResponse)
 
 	return listResponse, err
+}
+
+func (recs *Recordings) Get(recordingSid, accountSid string) (*Recording, error) {
+
+	// use master account if no sub account selected
+	if len(accountSid) == 0 {
+		accountSid = recs.Connection.Credentials.AccountSid
+	}
+
+	recUrl := fmt.Sprintf("Recordings/%s", url.QueryEscape(recordingSid))
+
+	resp, err := recs.Connection.Get(url.Values{}, accountSid, recUrl)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, convertToTwilioError(resp)
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+
+	response := new(Recording)
+
+	err = decoder.Decode(response)
+
+	return response, err
+}
+
+func (recs *Recordings) GetList(params RecordingParams) (*RecordingListResponse, error) {
+	return getRecordings(recs.Connection, params)
 }

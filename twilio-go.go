@@ -14,6 +14,7 @@ type TwilioRestClient struct {
 	NumRetries    int
 	Notifications resources.Notifications
 	Calls         resources.Calls
+	Recordings    resources.Recordings
 }
 
 func NewTwilioRestClient(sid, token string) *TwilioRestClient {
@@ -28,29 +29,17 @@ func NewTwilioRestClient(sid, token string) *TwilioRestClient {
 		log.Fatalf("twilio-go: Bad twilio api version (%s) or endpoint (%s) : %s", apibase, apiversion, err)
 	}
 
-	tcred := resources.TwilioAuth{
-		AccountSid: sid,
-		AuthToken:  token,
-	}
-
 	tcon := resources.TwilioConnection{
-		Credentials: tcred,
+		Credentials: resources.TwilioAuth{AccountSid: sid, AuthToken: token},
 		Endpoint:    twilioUrl.String(),
 		NumRetries:  retries,
 	}
 
-	tnots := resources.Notifications{
-		Connection: &tcon,
-	}
-
-	tcalls := resources.Calls{
-		Connection: &tcon,
-	}
-
 	return &TwilioRestClient{
 		Connection:    &tcon,
-		Notifications: tnots,
-		Calls:         tcalls,
+		Notifications: resources.Notifications{Connection: &tcon},
+		Calls:         resources.Calls{Connection: &tcon},
+		Recordings:    resources.Recordings{Connection: &tcon},
 		NumRetries:    retries}
 }
 
