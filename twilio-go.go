@@ -10,11 +10,12 @@ import (
 // add a constant for version
 
 type TwilioRestClient struct {
-	Connection    *resources.TwilioConnection
-	NumRetries    int
-	Notifications resources.Notifications
-	Calls         resources.Calls
-	Recordings    resources.Recordings
+	Connection     *resources.TwilioConnection
+	NumRetries     int
+	Notifications  resources.Notifications
+	Calls          resources.Calls
+	Recordings     resources.Recordings
+	Transcriptions resources.Transcriptions
 }
 
 func NewTwilioRestClient(sid, token string) *TwilioRestClient {
@@ -36,11 +37,12 @@ func NewTwilioRestClient(sid, token string) *TwilioRestClient {
 	}
 
 	return &TwilioRestClient{
-		Connection:    &tcon,
-		Notifications: resources.Notifications{Connection: &tcon},
-		Calls:         resources.Calls{Connection: &tcon},
-		Recordings:    resources.Recordings{Connection: &tcon},
-		NumRetries:    retries}
+		Connection:     &tcon,
+		Notifications:  resources.Notifications{Connection: &tcon},
+		Calls:          resources.Calls{Connection: &tcon},
+		Recordings:     resources.Recordings{Connection: &tcon},
+		Transcriptions: resources.Transcriptions{Connection: &tcon},
+		NumRetries:     retries}
 }
 
 func (trc *TwilioRestClient) SetRetries(retries int) {

@@ -18,6 +18,8 @@ type Transcription struct {
 }
 
 type TranscriptionListResponse struct {
+	ListResponse
+	List []Transcription `json:"transcriptions"`
 }
 
 type TranscriptionParams struct {
@@ -31,6 +33,11 @@ func (params *TranscriptionParams) AsValues() url.Values {
 	addParam(&queryVals, "RecordingSid", params.RecordingSid)
 
 	return queryVals
+}
+
+type Transcriptions struct {
+	Name       string
+	Connection *TwilioConnection
 }
 
 // getRecordings is a private function that returns notifications based on parameters
@@ -66,4 +73,34 @@ func getTranscriptions(con *TwilioConnection, params TranscriptionParams) (*Tran
 	err = decoder.Decode(listResponse)
 
 	return listResponse, err
+}
+
+func (res *Transcriptions) GetList(params TranscriptionParams) (*TranscriptionListResponse, error) {
+	return getTranscriptions(res.Connection, params)
+}
+
+func (res *Transcriptions) Get(transcriptionSid, accountSid string) (*Transcription, error) {
+
+	// use master account if no sub account selected
+	if len(accountSid) == 0 {
+		accountSid = res.Connection.Credentials.AccountSid
+	}
+
+	recUrl := fmt.Sprintf("Transcriptions/%s", url.QueryEscape(transcriptionSid))
+
+	resp, err := res.Connection.Get(url.Values{}, accountSid, recUrl)
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, convertToTwilioError(resp)
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+
+	response := new(Transcription)
+
+	err = decoder.Decode(response)
+
+	return response, err
 }
