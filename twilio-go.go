@@ -9,6 +9,8 @@ import (
 
 // add a constant for version
 
+// TwilioRestClient is the main type for the twilio-go adapter. It has references to all
+// the other types that the API defines. It is created using the NewTwilioRestClient func
 type TwilioRestClient struct {
 	Connection     *resources.TwilioConnection
 	NumRetries     int
@@ -20,6 +22,9 @@ type TwilioRestClient struct {
 	Usage          resources.Usage
 }
 
+// NewTwilioRestClient is used to create an instance of TwilioRestClient using the twilio
+// master account sid and token provided. It sets up the TwilioConnection type and sets the pointer
+// in all the sub resrources so they share it.
 func NewTwilioRestClient(sid, token string) *TwilioRestClient {
 	apibase := "https://api.twilio.com"
 	apiversion := "2010-04-01"
@@ -49,6 +54,8 @@ func NewTwilioRestClient(sid, token string) *TwilioRestClient {
 		NumRetries:     retries}
 }
 
+// SetRetries is used to set the number of times that the adapter should attempt
+// to call twilio
 func (trc *TwilioRestClient) SetRetries(retries int) {
 	trc.NumRetries = retries
 	trc.Connection.NumRetries = retries
