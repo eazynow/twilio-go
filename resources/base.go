@@ -5,11 +5,6 @@ import (
 	"strconv"
 )
 
-// The object representation of an instance response of twilio api
-type InstanceResource struct {
-	Resource
-}
-
 type PagingParams struct {
 	PageSize int `json:"page_size"`
 	Page     int `json:"page"`
