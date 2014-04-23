@@ -1,3 +1,4 @@
+// Package resources contains all the key twilio resource objects
 package resources
 
 import (
@@ -8,11 +9,13 @@ import (
 	"strings"
 )
 
+// TwilioAuth represents a set of twilio account credentials
 type TwilioAuth struct {
 	AccountSid string
 	AuthToken  string
 }
 
+// TwilioConnection represents a connection to the twilio api
 type TwilioConnection struct {
 	Credentials TwilioAuth
 	Endpoint    string

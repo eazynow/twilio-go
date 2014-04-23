@@ -41,6 +41,7 @@ type NotificationParams struct {
 	DateTo        string
 }
 
+// AsValues renders the notification parameters as a set of url values
 func (np *NotificationParams) AsValues() url.Values {
 
 	queryVals := np.PagingParams.AsValues()
@@ -64,6 +65,8 @@ type Notifications struct {
 	Connection *TwilioConnection
 }
 
+// Get returns a notfication based on the sid provided, optionally belonging to the
+// subaccount providied
 func (nots *Notifications) Get(notificationSid, accountSid string) (*Notification, error) {
 	notUrl := fmt.Sprintf("Notifications/%s", url.QueryEscape(notificationSid))
 
@@ -115,10 +118,13 @@ func getNotifications(con *TwilioConnection, params NotificationParams) (*Notifi
 	return listResponse, err
 }
 
+// GetList returns a list of notifications based on the parameters passed in
 func (nots *Notifications) GetList(params NotificationParams) (*NotificationListResponse, error) {
 	return getNotifications(nots.Connection, params)
 }
 
+// Delete deletes an individual notifications based on the sid and
+// optionally the subaccount sid
 func (nots *Notifications) Delete(notificationSid string, accountSid string) error {
 
 	notUrl := fmt.Sprintf("Notifications/%s", url.QueryEscape(notificationSid))
